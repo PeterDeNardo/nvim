@@ -1,58 +1,58 @@
 return {
   {
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
+    version = "*",
     event = "InsertEnter",
+
     dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip",
+      "rafamadriz/friendly-snippets",
     },
-    config = function()
-      local cmp = require("cmp")
 
-      -- Define o visual do texto fantasma (ghost text) estilo Copilot
-      vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+    opts = {
+      keymap = {
+        preset = "default",
 
-      cmp.setup({
-        completion = {
-          -- menu: mostra o menu / menuone: mostra mesmo se só tiver 1 opção / noselect: não seleciona sozinho
-          completeopt = "menu,menuone,noselect",
+        -- Mantive atalhos parecidos com os seus
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+
+        ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+
+        ["<C-n>"] = { "select_next", "fallback" },
+        ["<C-p>"] = { "select_prev", "fallback" },
+
+        ["<CR>"] = { "accept", "fallback" },
+
+        ["<Tab>"] = { "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+      },
+
+      completion = {
+        ghost_text = {
+          enabled = true,
         },
-        
-        -- Mapeamento de teclas para o menu de autocompletar
-        mapping = cmp.mapping.preset.insert({
-          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          
-          -- Navegar entre as opções do menu (Control + n / Control + p)
-          ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-          ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-          
-          -- Forçar o menu a abrir
-          ["<C-Space>"] = cmp.mapping.complete(),
-          
-          -- Fechar o menu sem selecionar nada
-          ["<C-e>"] = cmp.mapping.abort(),
-          
-          -- Confirmar a seleção com o Enter (<CR>)
-          ["<CR>"] = cmp.mapping.confirm({ select = false }), 
-        }),
 
-        -- Fontes de onde o autocomplete vai puxar as palavras
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" }, -- Sugestões inteligentes do Mason/LSP
-          { name = "path" },     -- Sugere caminhos de arquivos (ex: ./pasta/arquivo.lua)
-        }, {
-          { name = "buffer" },   -- Sugere palavras que você já digitou nesse mesmo arquivo
-        }),
-
-        experimental = {
-          -- Ativa o ghost_text (mostra uma prévia cinza antes de você aceitar)
-          ghost_text = {
-            hl_group = "CmpGhostText",
-          },
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 200,
         },
-      })
+      },
+
+      sources = {
+        default = {
+          "lsp",
+          "path",
+          "snippets",
+          "buffer",
+        },
+      },
+    },
+
+    config = function(_, opts)
+      require("blink.cmp").setup(opts)
+      require("luasnip.loaders.from_vscode").lazy_load()
     end,
   },
 }
